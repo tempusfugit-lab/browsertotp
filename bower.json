@@ -1,0 +1,12 @@
+{
+  "name": "browsertotp",
+  "private": true,
+  "dependencies": {
+    "blirhotp": "http://gitlab.tempusfugit.local/yiida/blirhotp.git",
+    "Sortable": "^1.4.2"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5"
+  }
+}
