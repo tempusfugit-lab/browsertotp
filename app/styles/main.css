@@ -53,6 +53,7 @@ div.add_icon {
   width: 40px;
   height: 100%;
   float: left;
+  /* "add.svg" recep kütük © 2015 http://recepkutuk.com/bitsies/ */
   background-image: url("../images/add.svg");
   background-repeat: no-repeat;
   background-position: center;
@@ -84,6 +85,7 @@ div.add_icon {
   margin-right: 4px;
   width: 32px;
   height: 100%;
+  /* "remove.svg" ©2014 finest.graphics http://finest.graphics/ */
   background-image: url("../images/remove.svg");
   background-repeat: no-repeat;
   background-position: center;
