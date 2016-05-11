@@ -95,7 +95,7 @@ return Sync;
     "@keyframes first_bar { from { width: " + rsec / 30 * 100 + "%; } to { width: 0; } }",
     document.styleSheets.length);
   refresh("first_bar", rsec);
-  sync.start(startSec >= 30 ? 0 : 30);
+  sync.start(startSec > 0 && startSec <= 30 ? 30 : 0);
 
   var addContent = null;
   function showAddDialog() {
