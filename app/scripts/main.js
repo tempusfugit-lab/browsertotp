@@ -212,10 +212,10 @@ return Sync;
   }
 
   function refresh(frames, asec) {
-    var now = new Date().getTime();
+    var aboutNow = Math.round(new Date().getTime() / 1000);
     var i;
     for(i = 0; i < itemList.length; i++) {
-      var hotpNumber = Hotp.generate(itemList[i].item.key, (now / 30000) & 0xffffffff);
+      var hotpNumber = Hotp.generate(itemList[i].item.key, (aboutNow / 30) & 0xffffffff);
       itemList[i].elem.textContent = ("00000" + hotpNumber).slice(-6);
     }
     for(i = 0; i < bars.length; i++) {
@@ -236,7 +236,6 @@ return Sync;
   };
   dialog.setTitle = function(title) {
     document.getElementById("dialog_title").textContent = title;
-    adjustDialogPos();
   };
   dialog.setContent = function(content) {
     var dialogContainer = document.getElementById("dialog_content");
@@ -244,23 +243,7 @@ return Sync;
       dialogContainer.removeChild(dialogContainer.lastChild);
     }
     dialogContainer.appendChild(content);
-    adjustDialogPos();
   };
-  function adjustDialogPos() {
-    var disp = overlay.style.display;
-    if(disp === "none") {
-      overlay.style.visibility = "hidden";
-      dialog.show();
-    }
-    var dialogElem = document.getElementById("dialog");
-    var top = (overlay.clientHeight - dialogElem.clientHeight) / 2 - 160;
-    dialogElem.style.top = (top >= 0 ? top : 0) + "px";
-    dialogElem.style.left = ((overlay.clientWidth - dialogElem.clientWidth) / 2) + "px";
-    if(disp === "none") {
-      dialog.close();
-    }
-    overlay.style.visibility = "visible";
-  }
   document.getElementById("dialog_close").addEventListener("click", function() { dialog.close(); }, false);
 
   function synchronized() {

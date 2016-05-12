@@ -118,7 +118,8 @@ div.add_icon {
 }
 
 #dialog {
-  position: absolute;
+  margin-top: 15vh;
+  display: inline-block;
   background-color: #fffaf0;
   border-radius: 5px;
 }
