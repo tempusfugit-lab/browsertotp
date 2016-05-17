@@ -1,6 +1,6 @@
 # browsertotp
 
-TOTP running on your web browser.  
+The TOTP application runnable on your browser.  
 The implementations **never** access internet and the outside,
 runnning on local only. So they can run standalone.
 
