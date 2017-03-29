@@ -64,6 +64,7 @@ return Sync;
   var fragment = document.createDocumentFragment();
   var itemContainer = document.getElementById("items");
   Sortable.create(itemContainer, {
+    handle: ".drag_handle",
     onEnd: function(evt) {
       var item = itemList.splice(evt.oldIndex, 1)[0];
       var newList = itemList.slice(0, evt.newIndex);
@@ -153,6 +154,7 @@ return Sync;
     var name = document.createElement("div");
     var icon = document.createElement("div");
     var hval = document.createElement("div");
+    head.className = "drag_handle";
     name.textContent = item.name;
     var hotpNumber = Hotp.generate(item.key, (new Date().getTime() / 30000) & 0xffffffff);
     hval.textContent = ("00000" + hotpNumber).slice(-6);
