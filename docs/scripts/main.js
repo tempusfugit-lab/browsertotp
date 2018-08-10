@@ -56,6 +56,23 @@ function awake() {
 }
 return Sync;
 })();
+
+const NAME_LABEL_TEXTCONTENT = "任意の名前: ";
+const KEY_LABEL_TEXTCONTENT = "シークレット設定キー: ";
+const URL_LABEL_TEXTCONTENT = "ログインURL: ";
+
+const BUTTON_ADD_OK_TEXTCONTENT = "MFAキーを登録する";
+const BUTTON_REMOVE_OK_TEXTCONTENT = "このMFAキーを削除する";
+const BUTTON_REMOVE_CANCEL_TEXTCONTENT = "キャンセルする";
+
+const ADD_DIALOG_TITLE = "MFAキー情報の新規登録";
+const REMOVE_DIALOG_TITLE = 'MFAキー情報の削除:';
+
+const ADDICONS_TOOLTIP = "クリックすると、MFAキー情報を新規登録します";
+const REMOVEICON_TOOLTIP = "クリックすると、MFAキー情報を削除します";
+const COPYKEYANDOPENURL_TOOLTIP = "クリックすると、MFAキーをクリップボードへコピーして、URLを別ウインドウで開きます";
+const OPENURL_TOOLTIP = "クリックすると、URLを別ウインドウで開きます";
+
 (function() {
   var lstorage = window.localStorage || {};
   var DATA_KEY = "items";
@@ -85,6 +102,7 @@ return Sync;
   var addIcons = document.getElementsByClassName("add_icon");
   for(var j = 0; j < addIcons.length; j++) {
     addIcons[j].addEventListener("click", showAddDialog, false);
+    addIcons[j].setAttribute('title', ADDICONS_TOOLTIP);
   }
 
   var iid = null;
@@ -107,27 +125,41 @@ return Sync;
       inputName = document.createElement("input");
       var labelKey = document.createElement("label");
       inputKey = document.createElement("input");
+      var labelUrl = document.createElement("label");
+      inputUrl = document.createElement("input");
       var buttonOk = document.createElement("button");
       addContent.className = "add_dialog";
-      labelName.textContent = "Name: ";
+      labelName.textContent = NAME_LABEL_TEXTCONTENT;
       inputName.type = "text";
       inputName.id = "input_name";
-      labelKey.textContent = "Key: ";
+      labelKey.textContent = KEY_LABEL_TEXTCONTENT;
       inputKey.type = "text";
       inputKey.id = "input_key";
-      buttonOk.textContent = "ok";
+      labelUrl.textContent = URL_LABEL_TEXTCONTENT;
+      inputUrl.type = "text";
+      inputUrl.id = "input_Url";
+      buttonOk.textContent = BUTTON_ADD_OK_TEXTCONTENT;
+
       var div = document.createElement("div");
       labelName.appendChild(inputName);
       div.appendChild(labelName);
       addContent.appendChild(div);
+
       div = document.createElement("div");
       labelKey.appendChild(inputKey);
       div.appendChild(labelKey);
       addContent.appendChild(div);
+
+      div = document.createElement("div");
+      labelUrl.appendChild(inputUrl);
+      div.appendChild(labelUrl);
+      addContent.appendChild(div);
+
       addContent.appendChild(buttonOk);
       buttonOk.addEventListener("click", function() {
         var name = inputName.value;
         var key;
+        var url = inputUrl.value;
         if(name.length <= 0){ return; }
         try {
           key = Hotp.decodeBase32(inputKey.value.toUpperCase());
@@ -135,15 +167,16 @@ return Sync;
           alert(e.message);
           return;
         }
-        addItem({name: name, key: key});
+        addItem({name: name, key: key, url: url});
         flushItems();
         dialog.close();
       }, false);
     }
-    dialog.setTitle("Add");
+    dialog.setTitle(ADD_DIALOG_TITLE);
     dialog.setContent(addContent);
     (inputName || document.getElementById("input_name")).value = "";
     (inputKey || document.getElementById("input_key")).value = "";
+    (inputUrl || document.getElementById("input_Url")).value = "";
     dialog.show();
   }
 
@@ -152,21 +185,32 @@ return Sync;
     var wrapper = document.createElement("div");
     var head = document.createElement("div");
     var name = document.createElement("div");
+    var url = document.createElement("div");
     var icon = document.createElement("div");
     var hval = document.createElement("div");
     head.className = "drag_handle";
     name.textContent = item.name;
-    var hotpNumber = Hotp.generate(item.key, (new Date().getTime() / 30000) & 0xffffffff);
-    hval.textContent = ("00000" + hotpNumber).slice(-6);
+    url.textContent = item.url;
+
     var listItem = {
       item: item,
       elem: hval
     };
+
     icon.addEventListener("click", function() { confirmRemove(listItem); }, false);
+    icon.setAttribute('title', REMOVEICON_TOOLTIP);
+
+    hval.id = "hval_text";
+    hval.setAttribute('title', COPYKEYANDOPENURL_TOOLTIP);
+
+    url.id = "url_text";
+    url.setAttribute('title', OPENURL_TOOLTIP);
+
     head.appendChild(name);
     head.appendChild(icon);
     wrapper.appendChild(head);
     wrapper.appendChild(hval);
+    wrapper.appendChild(url);
     container.insertBefore(wrapper, container.firstChild);
     itemList = [listItem].concat(itemList);
   }
@@ -183,8 +227,8 @@ return Sync;
       buttonOk.id = "remove_ok";
       var buttonCancel = document.createElement("button");
       removeContent.className = "remove_dialog";
-      buttonOk.textContent = "yes";
-      buttonCancel.textContent = "no";
+      buttonOk.textContent = BUTTON_REMOVE_OK_TEXTCONTENT;
+      buttonCancel.textContent = BUTTON_REMOVE_CANCEL_TEXTCONTENT;
       div.appendChild(buttonCancel);
       div.appendChild(buttonOk);
       removeContent.appendChild(div);
@@ -192,7 +236,7 @@ return Sync;
         dialog.close();
       }, false);
     }
-    removeContent.firstChild.textContent = 'Remove "' + listItem.item.name + '"?';
+    removeContent.firstChild.textContent = REMOVE_DIALOG_TITLE + ' "' + listItem.item.name + '"';
     dialog.setTitle("Remove");
     dialog.setContent(removeContent);
     (buttonOk || document.getElementById("remove_ok")).onclick =  function() {
@@ -226,7 +270,31 @@ return Sync;
       bars[i].style.animation = (frames || "bar") + " " + (asec || "30") + "s linear";
       p.appendChild(bars[i]);
     }
+
+    $("#hval_text").on("click", function(){
+      // Select text. (supports 'div' tag)
+      var range = document.createRange();
+      range.selectNodeContents(this);
+      var selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+
+      // Copy text to Clipboard.
+      document.execCommand('copy');
+
+      // Click next sibiling (Open Url).
+      var url = this.nextSibling;
+      url.click();
+    })
+
+    $("#url_text").on("click", function(){
+      // Open Url.
+      var url = this.textContent;
+      window.open(url, '_blank');
+    })
+
   }
+
   var dialog = {};
   var overlay = document.getElementById("overlay");
   overlay.style.display = "none";
@@ -247,6 +315,10 @@ return Sync;
     dialogContainer.appendChild(content);
   };
   document.getElementById("dialog_close").addEventListener("click", function() { dialog.close(); }, false);
+
+  if (items.length == 0) {
+    showAddDialog();
+  }
 
   function synchronized() {
     if(iid !== null) {
