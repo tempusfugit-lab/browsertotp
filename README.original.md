@@ -9,7 +9,7 @@ if not supported, will saved on memory).
 
 This application uses an HOTP library [blirhotp](https://github.com/tempusfugit-lab/blirhotp).
 
-[GitHub Pages](http://ogis-miyamura.github.io/browsertotp/)
+[GitHub Pages](http://tempusfugit-lab.github.io/browsertotp/)
 
 ## Installation for local use
 
