@@ -21,6 +21,8 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
+ * 
+ * TODO: https://github.com/ogis-miyamura/browsertotp/issues
  */
 Sync = (function() {
 
@@ -169,6 +171,7 @@ const OPENURL_TOOLTIP = "クリックすると、URLを別ウインドウで開�
         }
         addItem({name: name, key: key, url: url});
         flushItems();
+        refresh();
         dialog.close();
       }, false);
     }
