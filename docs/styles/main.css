@@ -49,14 +49,14 @@ div.bar_border {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
-  border: 2px solid #226182;
-  border-radius: 20px / 10px;
+  border: 1px solid #aaf;
+  border-radius: 8px;
   overflow: hidden;
 }
 
 div.bar {
   height: 100%;
-  background-color: #226182;
+  background-color: #004;
 }
 
 div.add_icon {
@@ -68,6 +68,7 @@ div.add_icon {
   background-repeat: no-repeat;
   background-position: center;
   background-size: 80% auto;
+  cursor: pointer;
 }
 
 #items {
@@ -100,6 +101,7 @@ div.add_icon {
   background-repeat: no-repeat;
   background-position: center;
   background-size: 100% auto;
+  cursor: pointer;
 }
 #items > div > div:nth-child(1)::after, .dialog_head::after {
   content: "";
@@ -113,12 +115,14 @@ div.add_icon {
   text-align: center;
   font-size: 2rem;
   font-weight: bold;
+  cursor: pointer;
 }
 
 #items > div > div:nth-child(3) {
   text-align: right;
   font-size: 1rem;
   color: #ccc;
+  cursor: pointer;
 }
 
 #overlay {
@@ -128,7 +132,7 @@ div.add_icon {
   width: 640px;
   height: 100vh;
   z-index: 1024;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.85);
   display: none;
   text-align: center;
 }
@@ -186,11 +190,13 @@ button {
 }
 
 @keyframes bar {
-  from { width: 100%; }
-  to { width: 0; }
+    0% { background-color: #004; width: 100%; }
+   70% { background-color: #004; }
+   75% { background-color: #c00; }
+  100% { background-color: #c00; width: 0; }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 1000px) {
   body, div.menu, #overlay,   #items > div > div:nth-child(2) {
     width: 100%;
   }

@@ -24,39 +24,39 @@
  * 
  * TODO: https://github.com/ogis-miyamura/browsertotp/issues
  */
-Sync = (function() {
+Sync = (function () {
 
-function Sync(func, intervalMin) {
-  this.__f = func;
-  this.__i = intervalMin * 60 * 1000;
-  this.__next = null;
-  this.__tid = null;
-  this.__awake = awake.bind(this);
-}
-Sync.prototype.start = function(syncSec) {
-  syncSec = (syncSec % 60) * 1000 || 60000;
-  var now = new Date().getTime();
-  var elapsed = (now % syncSec);
-  this.__next = now - elapsed + syncSec;
-  this.__awake();
-};
-Sync.prototype.stop = function() {
-  if(this.__tid !== null) {
-    clearTimeout(this.__tid);
+  function Sync(func, intervalMin) {
+    this.__f = func;
+    this.__i = intervalMin * 60 * 1000;
+    this.__next = null;
     this.__tid = null;
+    this.__awake = awake.bind(this);
   }
-};
-function awake() {
-  var now = new Date().getTime();
-  if(now >= this.__next) {
-    this.__next += this.__i;
-    this.__tid = setTimeout(this.__awake, this.__next - now - 1000);
-    this.__f();
-  } else {
-    this.__tid = setTimeout(this.__awake, this.__next - now);
+  Sync.prototype.start = function (syncSec) {
+    syncSec = (syncSec % 60) * 1000 || 60000;
+    var now = new Date().getTime();
+    var elapsed = (now % syncSec);
+    this.__next = now - elapsed + syncSec;
+    this.__awake();
+  };
+  Sync.prototype.stop = function () {
+    if (this.__tid !== null) {
+      clearTimeout(this.__tid);
+      this.__tid = null;
+    }
+  };
+  function awake() {
+    var now = new Date().getTime();
+    if (now >= this.__next) {
+      this.__next += this.__i;
+      this.__tid = setTimeout(this.__awake, this.__next - now - 1000);
+      this.__f();
+    } else {
+      this.__tid = setTimeout(this.__awake, this.__next - now);
+    }
   }
-}
-return Sync;
+  return Sync;
 })();
 
 const NAME_LABEL_TEXTCONTENT = "任意の名前: ";
@@ -75,7 +75,7 @@ const REMOVEICON_TOOLTIP = "クリックすると、MFAキー情報を削除し�
 const COPYKEYANDOPENURL_TOOLTIP = "クリックすると、MFAキーをクリップボードへコピーして、URLを別ウインドウで開きます";
 const OPENURL_TOOLTIP = "クリックすると、URLを別ウインドウで開きます";
 
-(function() {
+(function () {
   var lstorage = window.localStorage || {};
   var DATA_KEY = "items";
   var items = lstorage[DATA_KEY] ? JSON.parse(lstorage[DATA_KEY]) : [];
@@ -84,25 +84,25 @@ const OPENURL_TOOLTIP = "クリックすると、URLを別ウインドウで開�
   var itemContainer = document.getElementById("items");
   Sortable.create(itemContainer, {
     handle: ".drag_handle",
-    onEnd: function(evt) {
+    onEnd: function (evt) {
       var item = itemList.splice(evt.oldIndex, 1)[0];
       var newList = itemList.slice(0, evt.newIndex);
       newList.push(item);
-      if(evt.newIndex < itemList.length) {
+      if (evt.newIndex < itemList.length) {
         newList = newList.concat(itemList.slice(evt.newIndex));
       }
       itemList = newList;
       flushItems();
     }
   });
-  for(var i = items.length - 1; i >= 0; i--) {
+  for (var i = items.length - 1; i >= 0; i--) {
     addItem(items[i], fragment);
   }
   itemContainer.appendChild(fragment);
 
   var bars = Array.prototype.slice.call(document.getElementsByClassName("bar"));
   var addIcons = document.getElementsByClassName("add_icon");
-  for(var j = 0; j < addIcons.length; j++) {
+  for (var j = 0; j < addIcons.length; j++) {
     addIcons[j].addEventListener("click", showAddDialog, false);
     addIcons[j].setAttribute('title', ADDICONS_TOOLTIP);
   }
@@ -111,9 +111,14 @@ const OPENURL_TOOLTIP = "クリックすると、URLを別ウインドウで開�
   var sync = new Sync(synchronized, 5);
   var startSec = new Date().getSeconds();
   var rsec = 30 - startSec;
-  if(rsec <= 0) { rsec += 30; }
+  if (rsec <= 0) { rsec += 30; }
   document.styleSheets[0].insertRule(
-    "@keyframes first_bar { from { width: " + rsec / 30 * 100 + "%; } to { width: 0; } }",
+    "@keyframes first_bar { "
+    + "  0% { background-color: #004; width: " + rsec / 30 * 100 + "%; } "
+    + " 70% { background-color: #004; } "
+    + " 75% { background-color: #c00; } "
+    + "100% { background-color: #c00; width: 0; } "
+    + "}",
     document.styleSheets.length);
   refresh("first_bar", rsec);
   sync.start(startSec > 0 && startSec <= 30 ? 30 : 0);
@@ -121,7 +126,7 @@ const OPENURL_TOOLTIP = "クリックすると、URLを別ウインドウで開�
   var addContent = null;
   function showAddDialog() {
     var inputName, inputKey;
-    if(addContent === null) {
+    if (addContent === null) {
       addContent = document.createElement("div");
       var labelName = document.createElement("label");
       inputName = document.createElement("input");
@@ -158,18 +163,18 @@ const OPENURL_TOOLTIP = "クリックすると、URLを別ウインドウで開�
       addContent.appendChild(div);
 
       addContent.appendChild(buttonOk);
-      buttonOk.addEventListener("click", function() {
+      buttonOk.addEventListener("click", function () {
         var name = inputName.value;
         var key;
         var url = inputUrl.value;
-        if(name.length <= 0){ return; }
+        if (name.length <= 0) { return; }
         try {
           key = Hotp.decodeBase32(inputKey.value.toUpperCase());
-        } catch(e) {
+        } catch (e) {
           alert(e.message);
           return;
         }
-        addItem({name: name, key: key, url: url});
+        addItem({ name: name, key: key, url: url });
         flushItems();
         refresh();
         dialog.close();
@@ -200,7 +205,7 @@ const OPENURL_TOOLTIP = "クリックすると、URLを別ウインドウで開�
       elem: hval
     };
 
-    icon.addEventListener("click", function() { confirmRemove(listItem); }, false);
+    icon.addEventListener("click", function () { confirmRemove(listItem); }, false);
     icon.setAttribute('title', REMOVEICON_TOOLTIP);
 
     hval.id = "hval_text";
@@ -221,7 +226,7 @@ const OPENURL_TOOLTIP = "クリックすると、URLを別ウインドウで開�
   var removeContent = null;
   function confirmRemove(listItem) {
     var buttonOk;
-    if(removeContent === null) {
+    if (removeContent === null) {
       removeContent = document.createElement("div");
       var div = document.createElement("div");
       removeContent.appendChild(div);
@@ -235,14 +240,14 @@ const OPENURL_TOOLTIP = "クリックすると、URLを別ウインドウで開�
       div.appendChild(buttonCancel);
       div.appendChild(buttonOk);
       removeContent.appendChild(div);
-      buttonCancel.addEventListener("click", function() {
+      buttonCancel.addEventListener("click", function () {
         dialog.close();
       }, false);
     }
     removeContent.firstChild.textContent = REMOVE_DIALOG_TITLE + ' "' + listItem.item.name + '"';
     dialog.setTitle("Remove");
     dialog.setContent(removeContent);
-    (buttonOk || document.getElementById("remove_ok")).onclick =  function() {
+    (buttonOk || document.getElementById("remove_ok")).onclick = function () {
       var idx = itemList.indexOf(listItem);
       itemList.splice(idx, 1);
       itemContainer.removeChild(listItem.elem.parentNode);
@@ -254,7 +259,7 @@ const OPENURL_TOOLTIP = "クリックすると、URLを別ウインドウで開�
 
   function flushItems() {
     var itms = [];
-    itemList.forEach(function(val) {
+    itemList.forEach(function (val) {
       itms.push(val.item);
     });
     lstorage[DATA_KEY] = JSON.stringify(itms);
@@ -263,18 +268,19 @@ const OPENURL_TOOLTIP = "クリックすると、URLを別ウインドウで開�
   function refresh(frames, asec) {
     var aboutNow = Math.round(new Date().getTime() / 1000);
     var i;
-    for(i = 0; i < itemList.length; i++) {
+    for (i = 0; i < itemList.length; i++) {
       var hotpNumber = Hotp.generate(itemList[i].item.key, (aboutNow / 30) & 0xffffffff);
       itemList[i].elem.textContent = ("00000" + hotpNumber).slice(-6);
     }
-    for(i = 0; i < bars.length; i++) {
+    for (i = 0; i < bars.length; i++) {
       var p = bars[i].parentNode;
       p.removeChild(bars[i]);
       bars[i].style.animation = (frames || "bar") + " " + (asec || "30") + "s linear";
       p.appendChild(bars[i]);
     }
 
-    $("#hval_text").on("click", function(){
+    $("#hval_text").off("click");
+    $("#hval_text").on("click", function () {
       // Select text. (supports 'div' tag)
       var range = document.createRange();
       range.selectNodeContents(this);
@@ -290,10 +296,11 @@ const OPENURL_TOOLTIP = "クリックすると、URLを別ウインドウで開�
       url.click();
     })
 
-    $("#url_text").on("click", function(){
+    $("#url_text").off("click");
+    $("#url_text").on("click", function () {
       // Open Url.
       var url = this.textContent;
-      window.open(url, '_blank');
+      window.open(url, url);
     })
 
   }
@@ -301,30 +308,30 @@ const OPENURL_TOOLTIP = "クリックすると、URLを別ウインドウで開�
   var dialog = {};
   var overlay = document.getElementById("overlay");
   overlay.style.display = "none";
-  dialog.show = function() {
+  dialog.show = function () {
     overlay.style.display = "block";
   };
-  dialog.close = function() {
+  dialog.close = function () {
     overlay.style.display = "none";
   };
-  dialog.setTitle = function(title) {
+  dialog.setTitle = function (title) {
     document.getElementById("dialog_title").textContent = title;
   };
-  dialog.setContent = function(content) {
+  dialog.setContent = function (content) {
     var dialogContainer = document.getElementById("dialog_content");
-    while(dialogContainer.lastChild) {
+    while (dialogContainer.lastChild) {
       dialogContainer.removeChild(dialogContainer.lastChild);
     }
     dialogContainer.appendChild(content);
   };
-  document.getElementById("dialog_close").addEventListener("click", function() { dialog.close(); }, false);
+  document.getElementById("dialog_close").addEventListener("click", function () { dialog.close(); }, false);
 
   if (items.length == 0) {
     showAddDialog();
   }
 
   function synchronized() {
-    if(iid !== null) {
+    if (iid !== null) {
       clearInterval(iid);
     }
     refresh();
