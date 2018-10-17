@@ -208,10 +208,10 @@ const OPENURL_TOOLTIP = "クリックすると、URLを別ウインドウで開�
     icon.addEventListener("click", function () { confirmRemove(listItem); }, false);
     icon.setAttribute('title', REMOVEICON_TOOLTIP);
 
-    hval.id = "hval_text";
+    hval.className = "hval_text";
     hval.setAttribute('title', COPYKEYANDOPENURL_TOOLTIP);
 
-    url.id = "url_text";
+    url.className = "url_text";
     url.setAttribute('title', OPENURL_TOOLTIP);
 
     head.appendChild(name);
@@ -279,29 +279,33 @@ const OPENURL_TOOLTIP = "クリックすると、URLを別ウインドウで開�
       p.appendChild(bars[i]);
     }
 
-    $("#hval_text").off("click");
-    $("#hval_text").on("click", function () {
-      // Select text. (supports 'div' tag)
-      var range = document.createRange();
-      range.selectNodeContents(this);
-      var selection = window.getSelection();
-      selection.removeAllRanges();
-      selection.addRange(range);
+    $(".hval_text").each(function(index) {
+      $(this).off("click");
+      $(this).on("click", function () {
+        // Select text. (supports 'div' tag)
+        var range = document.createRange();
+        range.selectNodeContents(this);
+        var selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+  
+        // Copy text to Clipboard.
+        document.execCommand('copy');
+  
+        // Click next sibiling (Open Url).
+        var url = this.nextSibling;
+        url.click();
+      })
+    });
 
-      // Copy text to Clipboard.
-      document.execCommand('copy');
-
-      // Click next sibiling (Open Url).
-      var url = this.nextSibling;
-      url.click();
-    })
-
-    $("#url_text").off("click");
-    $("#url_text").on("click", function () {
-      // Open Url.
-      var url = this.textContent;
-      window.open(url, url);
-    })
+    $(".url_text").each(function(index) {
+      $(this).off("click");
+      $(this).on("click", function () {
+        // Open Url.
+        var url = this.textContent;
+        window.open(url, url);
+      })
+    });
 
   }
 
